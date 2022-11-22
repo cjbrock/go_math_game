@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
-	"log"
 	"os"
 )
 
@@ -16,24 +15,22 @@ func main() {
 	// read data here
 	questions, err := DataIn("problems.csv")
 
-	// log fatal errors
+	// log errors
 	if err != nil {
-		log.Fatal(err)
+		quit("Failed to parse the provided CSV file.")
 	}
 
-	// create each question, figure out delimiters
+	// create each question
+	// print out questions just as a test, then move on
 	for _, quests := range questions {
 
 		quest := Question{
 			q:   quests[0],
 			ans: quests[1],
 		}
-
+		// call a function that outputs the questions, checks the answers, and then outputs the
 		fmt.Printf("q: %s:, ans: %s ", quest.q, quest.ans)
-
 	}
-
-	// print out questions just as a test, then move on
 }
 
 func DataIn(fileName string) ([][]string, error) {
@@ -53,11 +50,15 @@ func DataIn(fileName string) ([][]string, error) {
 	}
 
 	return records, nil
-
 }
 
-// parse in csv
-// separate into questions
+func quit(mess string) {
+	fmt.Printlm(mess)
+	os.Exit(1)
+}
+
+// parse in csv - DONE
+// separate into questions - DONE
 // output to user
 // take in user info
 // check against answer
