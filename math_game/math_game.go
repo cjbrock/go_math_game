@@ -1,0 +1,5 @@
+package mathgame
+
+func main() {
+
+}
