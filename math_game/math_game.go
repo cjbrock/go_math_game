@@ -1,20 +1,38 @@
-package mathgame
+package main
 
 import (
 	"encoding/csv"
+	"fmt"
+	"log"
 	"os"
 )
 
 type Question struct {
-	q1  int
-	q2  int
-	ans int
+	q   string
+	ans string
 }
 
 func main() {
 	// read data here
+	questions, err := DataIn("problems.csv")
+
 	// log fatal errors
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	// create each question, figure out delimiters
+	for _, quests := range questions {
+
+		quest := Question{
+			q:   quests[0],
+			ans: quests[1],
+		}
+
+		fmt.Printf("q: %s:, ans: %s ", quest.q, quest.ans)
+
+	}
+
 	// print out questions just as a test, then move on
 }
 
