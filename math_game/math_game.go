@@ -2,74 +2,57 @@ package main
 
 import (
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"os"
+	"strings"
 )
 
-type Question struct {
-	q   string
-	ans string
-}
-
 func main() {
-	// read data here
-	questions, err := DataIn("problems.csv")
+	csvFilename := flag.String("csv", "problems.csv", "a csv file in the format of 'question,answer'")
+	flag.Parse()
 
-	// log errors
+	file, err := os.Open(*csvFilename)
 	if err != nil {
-		quit("Failed to parse the provided CSV file.")
+		exit(fmt.Sprintf("Failed to open the CSV file: %s\n", *csvFilename))
 	}
-
-	// create each question
-	// print out questions just as a test, then move on
-	for _, quests := range questions {
-
-		quest := Question{
-			q:   quests[0],
-			ans: quests[1],
-		}
-		// call a function that outputs the questions, checks the answers, and then outputs the
-		fmt.Printf("q: %s:, ans: %s ", quest.q, quest.ans)
-	}
-}
-
-func DataIn(fileName string) ([][]string, error) {
-	file, err := os.Open(fileName)
-
-	if err != nil {
-		return [][]string{}, err
-	}
-
-	defer file.Close()
-
 	r := csv.NewReader(file)
-
-	records, err := r.ReadAll()
+	lines, err := r.ReadAll()
 	if err != nil {
-		return [][]string{}, err
+		exit("Failed to parse the provided CSV file.")
+	}
+	problems := parseLines(lines)
+
+	correct := 0
+	for i, p := range problems {
+		fmt.Printf("Problem #%d: %s = \n", i+1, p.q)
+		var answer string
+		fmt.Scanf("%s\n", &answer)
+		if answer == p.a {
+			correct++
+		}
 	}
 
-	return records, nil
+	fmt.Printf("You scored %d out of %d.\n", correct, len(problems))
 }
 
-func quit(mess string) {
-	fmt.Println(mess)
+func parseLines(lines [][]string) []problem {
+	ret := make([]problem, len(lines))
+	for i, line := range lines {
+		ret[i] = problem{
+			q: line[0],
+			a: strings.TrimSpace(line[1]),
+		}
+	}
+	return ret
+}
+
+type problem struct {
+	q string
+	a string
+}
+
+func exit(msg string) {
+	fmt.Println(msg)
 	os.Exit(1)
 }
-
-// parse in csv - DONE
-// separate into questions - DONE
-// output to user
-// take in user info
-// check against answer
-// track correct answers
-// track number of questions
-// at the end of the file, output correct/total questions
-
-// part 2:
-// add timer
-// default to 30 seconds
-// take in optional flag
-// clean white space around input
-// check for non-valid input (letters, etc)
-// shuffle questions
