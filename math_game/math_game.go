@@ -53,7 +53,7 @@ func DataIn(fileName string) ([][]string, error) {
 }
 
 func quit(mess string) {
-	fmt.Printlm(mess)
+	fmt.Println(mess)
 	os.Exit(1)
 }
 
