@@ -2,57 +2,83 @@ package main
 
 import (
 	"encoding/csv"
-	"flag"
 	"fmt"
+	"log"
 	"os"
-	"strings"
 )
 
+
+
 func main() {
-	csvFilename := flag.String("csv", "problems.csv", "a csv file in the format of 'question,answer'")
-	flag.Parse()
-
-	file, err := os.Open(*csvFilename)
+	// read data here
+	questions, err := DataIn("problems.csv")
+	// log errors
 	if err != nil {
-		exit(fmt.Sprintf("Failed to open the CSV file: %s\n", *csvFilename))
+		quit("Failed to parse the provided CSV file.")
 	}
+	problems := parseRows(questions)
+
+}
+
+func parseRows(rows [][]string) []question {
+	fmt.Printf("%s", rows)
+	// create each question
+	// print out questions just as a test, then move on
+	askme := make([]question, len(rows)) 
+		for i, row := range rows {
+			askme[i] := question{
+				q:   row[0],
+				ans: row[1],
+			}
+			fmt.Printf("q: %s:, ans: %s ", askme.q, askme.ans)
+		}
+		// call a function that outputs the questions, checks the answers, and then outputs the
+		
+	return askme
+}
+
+type question struct {
+	q   string
+	ans string
+}
+
+func DataIn(fileName string) ([][]string, error) {
+	file, err := os.Open(fileName)
+
+	if err != nil {
+		return [][]string{}, err
+	}
+
+	defer file.Close()
+
 	r := csv.NewReader(file)
-	lines, err := r.ReadAll()
+
+	records, err := r.ReadAll()
 	if err != nil {
-		exit("Failed to parse the provided CSV file.")
-	}
-	problems := parseLines(lines)
-
-	correct := 0
-	for i, p := range problems {
-		fmt.Printf("Problem #%d: %s = \n", i+1, p.q)
-		var answer string
-		fmt.Scanf("%s\n", &answer)
-		if answer == p.a {
-			correct++
-		}
+		return [][]string{}, err
 	}
 
-	fmt.Printf("You scored %d out of %d.\n", correct, len(problems))
+	return records, nil
 }
 
-func parseLines(lines [][]string) []problem {
-	ret := make([]problem, len(lines))
-	for i, line := range lines {
-		ret[i] = problem{
-			q: line[0],
-			a: strings.TrimSpace(line[1]),
-		}
-	}
-	return ret
-}
-
-type problem struct {
-	q string
-	a string
-}
-
-func exit(msg string) {
-	fmt.Println(msg)
+func quit(mess string) {
+	fmt.Println(mess)
 	os.Exit(1)
 }
+
+// parse in csv - DONE
+// separate into questions - DONE
+// output to user
+// take in user info
+// check against answer
+// track correct answers
+// track number of questions
+// at the end of the file, output correct/total questions
+
+// part 2:
+// add timer
+// default to 30 seconds
+// take in optional flag
+// clean white space around input
+// check for non-valid input (letters, etc)
+// shuffle questions
